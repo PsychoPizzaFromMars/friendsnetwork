@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "friends-network"
+version = "0.1.0"
+description = "OpenAPI based backend for following friends."
+authors = ["Andrew Borovikov <andrw.brvkv@gmail.com>"]
+readme = "README.md"
+packages = [{include = "friends_network"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+Django = "^4.2.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
