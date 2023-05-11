@@ -88,7 +88,6 @@ paths:
                       type: string
                       description: Name of the authenticated user
                       example: janedoe
-  
   /profile/friends:
     get:
       summary: Get a list of friends for a user
@@ -111,73 +110,6 @@ paths:
                       type: string
                       description: The username of the friend
                       example: janedoe
-  /profile/friends/{userId}:
-    get:
-      summary: Get the friendship status between two users
-      parameters:
-        - in: path
-          name: userId
-          required: true
-          description: The ID of the target user
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: The friendship status between two users
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  friendship_status:
-                    type: string
-                    description: The current friendship status between the users
-                    enum:
-                      - pending_outgoing
-                      - pending_incoming
-                      - accepted
-                      - none
-    post:
-      summary: Send a friend request to another user
-      parameters:
-        - in: path
-          name: userId
-          required: true
-          description: The ID of the requesting user
-          schema:
-            type: integer
-            format: int64
-        - in: query
-          name: friendId
-          required: true
-          description: The ID of the user to send the request to
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: Friend request sent successfully
-        '400':
-          description: Invalid request parameters
-        '404':
-          description: User not found
-    delete:
-      summary: Delete a friend from a user's friend list
-      parameters:
-        - in: path
-          name: userId
-          required: true
-          description: The ID of the user to delete
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '204':
-          description: Friend deleted successfully
-        '404':
-          description: User or friend not found
-  
   /profile/friendships:
     get:
       summary: Get a list of incoming and outgoing friend requests for a user
@@ -207,16 +139,35 @@ paths:
                       format: int64
                       description: The ID of the user who received the request
                       example: 3
-                    status:
-                      type: string
-                      description: The current status of the friend request
-                      enum:
-                        - pending_outgoing
-                        - pending_incoming
-                        - accepted
-                        - none
+  /profile/friendships/{userId}:
+    get:
+      summary: Get the friendship status between two users
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          description: The ID of the target user
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: The friendship status between two users
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  friendship_status:
+                    type: string
+                    description: The current friendship status between the users
+                    enum:
+                      - pending_outgoing
+                      - pending_incoming
+                      - friends
+                      - none  
     post:
-      summary: Accept incoming friend requests and make users friends
+      summary: Send/accept friend request.
       requestBody:
         required: true
         content:
@@ -237,15 +188,29 @@ paths:
                   example: 2
       responses:
         '200':
-          description: Users are now friends
+          description: Realtionship request sent or accepted
         '400':
           description: Invalid request parameters
         '404':
           description: User or friend request not found
         '409':
-          description: Users are already friends or friend request was already accepted
-  
-  
+          description: Users are already friends or friend request was already accepted       
+    delete:
+      summary: Delete a friend from a user's friend list or outgoing friend request
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          description: The ID of the user to delete
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Relationship deleted successfully
+        '404':
+          description: User or friend not found                     
+                      
   
   
   

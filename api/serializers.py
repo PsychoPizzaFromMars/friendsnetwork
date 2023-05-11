@@ -1,5 +1,5 @@
 from django.contrib.auth import authenticate
-from django.contrib.auth.models import User
+from .models import User, Friendship
 from django.db import IntegrityError
 from rest_framework import serializers
 
@@ -35,7 +35,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            'username',
+            'id', 'username',
         ]
         extra_kwargs = {'password': {'write_only': True}}
 
@@ -51,8 +51,10 @@ class UserSerializer(serializers.ModelSerializer):
         except IntegrityError:
             raise serializers.ValidationError({'error': 'Username already exists'})
 
-# class RegisterUserSerializer(serializers.Serializer):
-#     username = serializers.CharField(max_length=150)
-#     password = serializers.CharField(write_only=True, max_length=128)
-#     email = serializers.EmailField()
+class FriendshipSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Friendship
+        fields = [
+            'id', 'from_user', 'to_user'
+        ]
 

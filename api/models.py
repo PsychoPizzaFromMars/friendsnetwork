@@ -1,29 +1,28 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
+
 # Create your models here.
 
+
+class User(AbstractUser):
+    friends = models.ManyToManyField("User", blank=True)
+
+
 class Friendship(models.Model):
-    STATUS_CHOICES = (
-        ('pending_outgoing', 'Pending Outgoing'),
-        ('pending_incoming', 'Pending Incoming'),
-        ('accepted', 'Accepted'),
-        ('none', 'None'),
+    from_user = models.ForeignKey(
+        User, on_delete=models.CASCADE, null=True, related_name="outgoing_request"
     )
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='friendships')
-    friend = models.ForeignKey(User, on_delete=models.CASCADE, related_name='friends')
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES)
+    to_user = models.ForeignKey(
+        User, on_delete=models.CASCADE, null=True, related_name="incoming_request"
+    )
 
-    def accept(self):
-        self.status = 'accepted'
-        self.save()
-        # Automatically create a reciprocal friendship
-        Friendship.objects.get_or_create(user=self.friend, friend=self.user, status='accepted')
-
-    def reject(self):
-        self.status = 'none'
-        self.save()
-
-    def remove_friend(self):
-        self.delete()
-        # Delete reciprocal friendship
-        Friendship.objects.filter(user=self.friend, friend=self.user).delete()
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["from_user", "to_user"], name="unique_friend_request"
+            ),
+            models.CheckConstraint(
+                check=~models.Q(from_user=models.F("to_user")),
+                name="self_request_check",
+            ),
+        ]
